@@ -3,8 +3,11 @@ import { AuthService } from './auth.service';
 import { SigninDto } from './dtos/signin.dto';
 import { SignupDto } from './dtos/signup.dto';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
+import { ConfirmDto } from './dtos/confirm.dto';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signin')
@@ -26,13 +29,21 @@ export class AuthController {
     return signedUser;
   }
 
+  @Post('activate-user')
+  async activateUser(@Body() confirmDto: ConfirmDto) {
+    const { code, id } = confirmDto;
+
+    await this.authService.activateUser(id, code);
+
+    return;
+  }
+
   @Post('validate')
   async validate(@Req() req: Request) {
     const authorization = req.headers.authorization;
     const token = authorization.split(' ')[1];
 
-    const signedUser =
-      await this.authService.validateAndGenerateNewJwtToken(token);
+    const signedUser = await this.authService.validateUser(token);
 
     return signedUser;
   }

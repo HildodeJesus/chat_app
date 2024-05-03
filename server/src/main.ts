@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { setupSwagger } from './config/swagger.config';
 
+const port = process.env.PORT || 3000;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -14,7 +16,9 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  await app.listen(3000);
+  await app.listen(port, () =>
+    console.log(`Server started on the port: ${port}`),
+  );
 }
 
 bootstrap();
