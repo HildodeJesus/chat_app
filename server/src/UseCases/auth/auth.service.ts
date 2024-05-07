@@ -12,6 +12,7 @@ import { SignupDto } from './dtos/signup.dto';
 import { UsersService } from '../users/users.service';
 import { ValidationCodes } from 'src/entities/validationCodes.entity';
 import { Users } from 'src/entities/users.entity';
+import { generateRandomNumbers } from 'src/helpers/generateRandomNumbers';
 
 @Injectable()
 export class AuthService {
@@ -86,7 +87,12 @@ export class AuthService {
     return { token, payload };
   }
 
-  async activateUser(userId: string, code: string) {
+  async startUserValidation(userId: string) {
+    const code = generateRandomNumbers(1000, 9999);
+    await this.validationCodesRepository.save({ code, user: { id: userId } });
+  }
+
+  async activateUser(userId: string, code: number) {
     const dateNow = Date.now();
 
     const validationCode = await this.validationCodesRepository.findOne({
@@ -98,8 +104,8 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
 
-    // Atualizar User
+    await this.usersService.update(userId, { is_activated: true });
 
-    return true;
+    return;
   }
 }

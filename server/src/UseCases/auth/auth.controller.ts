@@ -33,7 +33,7 @@ export class AuthController {
   async activateUser(@Body() confirmDto: ConfirmDto) {
     const { code, id } = confirmDto;
 
-    await this.authService.activateUser(id, code);
+    await this.authService.activateUser(id, Number(code));
 
     return;
   }

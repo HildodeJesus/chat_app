@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "@nestjs/bull": "^10.1.1",
     "@nestjs/jwt": "^10.2.0",
-    "bcrypt": "^5.1.1"
+    "bcrypt": "^5.1.1",
+    "bull": "^4.12.2"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2"
+    "@types/bcrypt": "^5.0.2",
+    "@types/bull": "^4.10.0"
   }
 }

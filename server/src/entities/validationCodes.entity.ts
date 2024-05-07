@@ -15,7 +15,7 @@ export class ValidationCodes {
   id: number;
 
   @Column({ nullable: false })
-  code: string;
+  code: number;
 
   @OneToMany(() => Users, (users) => users.id, {
     nullable: false,
