@@ -1,6 +1,6 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-export = TypeOrmModule.forRoot({
+export default TypeOrmModule.forRoot({
   type: 'mysql',
   host: process.env.DATABASE_HOST,
   port: Number(process.env.DATABASE_PORT),

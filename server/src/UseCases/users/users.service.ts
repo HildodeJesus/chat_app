@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Users } from 'src/entities/users.entity';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Users } from 'src/entities/users.entity';
 import { SignupDto } from '../auth/dtos/signup.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: Repository<Users>) {}
+  constructor(
+    @InjectRepository(Users) private usersRepository: Repository<Users>,
+  ) {}
 
   async store(signupDto: SignupDto) {
     await this.usersRepository.save(signupDto);

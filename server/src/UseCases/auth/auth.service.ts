@@ -13,13 +13,18 @@ import { UsersService } from '../users/users.service';
 import { ValidationCodes } from 'src/entities/validationCodes.entity';
 import { Users } from 'src/entities/users.entity';
 import { generateRandomNumbers } from 'src/helpers/generateRandomNumbers';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(ValidationCodes)
     private validationCodesRepository: Repository<ValidationCodes>,
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectQueue('send-validation-email') private sendValidationEmail: Queue,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -89,7 +94,12 @@ export class AuthService {
 
   async startUserValidation(userId: string) {
     const code = generateRandomNumbers(1000, 9999);
+    const user = await this.usersService.getById(userId);
     await this.validationCodesRepository.save({ code, user: { id: userId } });
+
+    this.sendValidationEmail.add({ code, email: user.email, name: user.name });
+
+    return;
   }
 
   async activateUser(userId: string, code: number) {

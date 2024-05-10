@@ -5,5 +5,7 @@ import { UsersModule } from './UseCases/users/users.module';
 
 @Module({
   imports: [typeOrmConfig, AuthModule, UsersModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
