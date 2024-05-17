@@ -5,11 +5,17 @@ import { SignupDto } from './dtos/signup.dto';
 import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { ConfirmDto } from './dtos/confirm.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @InjectQueue('send-validation-email')
+    private sendValidationEmailQueue: Queue,
+    private readonly authService: AuthService,
+  ) {}
   @Post('signin')
   async signin(@Body() signinDto: SigninDto) {
     const { email, password } = signinDto;

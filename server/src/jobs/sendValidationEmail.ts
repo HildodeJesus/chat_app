@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
-@Processor('sendValidationEmail')
+@Processor('send-validation-email')
 export class SendValidationEmailProcessor {
   constructor(private mailerService: MailerService) {}
   @Process()

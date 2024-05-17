@@ -1,4 +1,5 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 
 export default TypeOrmModule.forRoot({
   type: 'mysql',
@@ -7,4 +8,9 @@ export default TypeOrmModule.forRoot({
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASS,
   database: process.env.DATABASE_NAME,
+  autoLoadEntities: true,
+  entities: [join(__dirname, '../', '/entities/*.entity.ts')],
+  migrations: [join(__dirname, '..', 'database', 'migrations')],
+  migrationsTableName: 'custom_migration_table',
+  synchronize: true,
 });

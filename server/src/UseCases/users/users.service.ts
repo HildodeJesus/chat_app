@@ -47,4 +47,12 @@ export class UsersService {
 
     return;
   }
+
+  async delete(id: string) {
+    const queryBuilder = this.usersRepository.createQueryBuilder('users');
+
+    await queryBuilder.delete().where('users.id = :id', { id }).execute();
+
+    return;
+  }
 }

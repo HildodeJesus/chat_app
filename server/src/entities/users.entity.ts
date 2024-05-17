@@ -2,7 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,7 +25,7 @@ export class Users {
   @Column({ default: false })
   is_activated: boolean;
 
-  @ManyToOne(() => ValidationCodes, (codes) => codes.id)
+  @OneToMany(() => ValidationCodes, (codes) => codes.id)
   validationCodes: ValidationCodes[];
 
   @CreateDateColumn()

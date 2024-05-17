@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,7 +17,7 @@ export class ValidationCodes {
   @Column({ nullable: false })
   code: number;
 
-  @OneToMany(() => Users, (users) => users.id, {
+  @ManyToOne(() => Users, (users) => users.id, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
