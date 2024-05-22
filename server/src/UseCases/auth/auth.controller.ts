@@ -1,21 +1,16 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, HttpException, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninDto } from './dtos/signin.dto';
 import { SignupDto } from './dtos/signup.dto';
 import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { ConfirmDto } from './dtos/confirm.dto';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(
-    @InjectQueue('send-validation-email')
-    private sendValidationEmailQueue: Queue,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
+
   @Post('signin')
   async signin(@Body() signinDto: SigninDto) {
     const { email, password } = signinDto;
@@ -47,6 +42,9 @@ export class AuthController {
   @Post('validate')
   async validate(@Req() req: Request) {
     const authorization = req.headers.authorization;
+    if (!authorization)
+      throw new HttpException('Necessário está logado no sistema!', 403);
+
     const token = authorization.split(' ')[1];
 
     const signedUser = await this.authService.validateUser(token);

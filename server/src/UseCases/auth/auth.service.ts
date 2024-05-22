@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -29,7 +30,7 @@ export class AuthService {
 
   async signup(signupDto: SignupDto) {
     const existUser = await this.usersService.getOneByEmail(signupDto.email);
-    if (!existUser)
+    if (existUser)
       throw new HttpException(
         { message: 'Email já cadastrado no nosso produto anteriormente' },
         HttpStatus.BAD_REQUEST,
@@ -44,6 +45,8 @@ export class AuthService {
     };
 
     await this.usersService.store(newUser);
+
+    await this.startUserValidation(signupDto.email);
 
     return;
   }
@@ -87,32 +90,56 @@ export class AuthService {
       isActivated: user.is_activated,
     };
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '3d',
+    });
 
     return { token, payload };
   }
 
-  async startUserValidation(userId: string) {
+  async startUserValidation(email: string) {
     const code = generateRandomNumbers(1000, 9999);
-    const user = await this.usersService.getById(userId);
-    await this.validationCodesRepository.save({ code, user: { id: userId } });
+    const dateNow = Date.now() / 1000;
 
-    this.sendValidationEmail.add({ code, email: user.email, name: user.name });
+    const user = await this.usersService.getOneByEmail(email);
+    if (!user)
+      throw new HttpException('Usuário não existe em nosso sistema!', 400);
+
+    await this.validationCodesRepository.save({
+      code,
+      user: { id: user.id },
+      expire: dateNow,
+    });
+
+    this.sendValidationEmail.add(
+      {
+        code,
+        email: user.email,
+        name: user.name,
+      },
+      { delay: 5000 },
+    );
 
     return;
   }
 
-  async activateUser(userId: string, code: number) {
+  async validateValidationCode(userId: string, code: number) {
     const dateNow = Date.now();
 
     const validationCode = await this.validationCodesRepository.findOne({
       where: { code: code, user: { id: userId } },
     });
-    if (validationCode == null || validationCode.expire < dateNow / 1000)
-      throw new HttpException(
-        { message: 'Código inválido!' },
-        HttpStatus.BAD_REQUEST,
-      );
+
+    if (validationCode == null || validationCode.expire < dateNow * 1000)
+      return false;
+
+    return true;
+  }
+
+  async activateUser(userId: string, code: number) {
+    const validateCode = await this.validateValidationCode(userId, code);
+    if (!validateCode) throw new BadRequestException();
 
     await this.usersService.update(userId, { is_activated: true });
 
