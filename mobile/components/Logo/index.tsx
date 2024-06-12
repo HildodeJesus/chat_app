@@ -11,7 +11,7 @@ export default function Logo({ size }: LogoProps) {
 				size={size}
 				source={require("../../assets/whatsapp-icon.png")}
 			/>
-			<S.LogoText size={(40 / 100) * size}>Whatsapp</S.LogoText>
+			<S.LogoText size={(40 / 100) * size}>What-Is</S.LogoText>
 		</S.LogoContainer>
 	);
 }
